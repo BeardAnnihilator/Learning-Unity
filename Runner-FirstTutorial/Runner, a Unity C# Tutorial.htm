@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)http://catlikecoding.com/unity/tutorials/runner/ -->
+<html><head prefix="og: http://ogp.me/ns#"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<meta property="og:url" content="http://catlikecoding.com/unity/tutorials/runner/">
+		<meta property="og:image" content="http://catlikecoding.com/unity/tutorials/runner/particles_in_action.png">
+		<meta name="description" property="og:description" content="A Unity C# scripting tutorial in which you will create a very simple endless running game.">
+		<meta property="og:title" content="Runner, a Unity C# Tutorial">
+		<title>Runner, a Unity C# Tutorial</title>
+		<link href="http://catlikecoding.com/unity/default.css" rel="stylesheet">
+		<script src="./Runner, a Unity C# Tutorial_files/cb=gapi.loaded_1" async=""></script><script src="./Runner, a Unity C# Tutorial_files/cb=gapi.loaded_0" async=""></script><script type="text/javascript" async="" src="./Runner, a Unity C# Tutorial_files/platform.js" gapi_processed="true"></script><script id="facebook-jssdk" src="http://connect.facebook.net/en_US/all.js#xfbml=1&appId=224517547559857"></script><script id="twitter-wjs" src="http://platform.twitter.com/widgets.js"></script><script async="" src="./Runner, a Unity C# Tutorial_files/ga.js"></script><script src="https://apis.google.com/js/plusone.js"></script><script>
+			var customTypes = {
+				Booster: 1,
+				GameEvent: 1,
+				GameEventManager: 1,
+				GUIManager: 1,
+				ParticleEmitterManager: 1,
+				PlatformManager: 1,
+				Runner: 1,
+				SkylineManager: 1
+			};
+		</script><style type="text/css"></style><style type="text/css"></style>
+	</head>
+	<body>
+		<header data-type="tutorial"><div id="tutorial-header"><div id="___plusone_0" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 90px; height: 20px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 90px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I0_1392920107184" name="I0_1392920107184" src="./Runner, a Unity C# Tutorial_files/fastbutton.htm" data-gapiattached="true" title="+1"></iframe></div><iframe src="about:blank" style="border:none; overflow:hidden; width:100px; height:21px;"></iframe><a id="blog-icon" href="http://catlikecoding.com/blog/category:unity/tags:unity+tutorials" title="Catlike Coding Blog"></a><a id="twitter-icon" href="http://twitter.com/catlikecoding" title="Catlike Coding on Twitter"></a><a id="facebook-icon" href="http://www.facebook.com/unity.c.sharp.tutorials" title="Unity C# Tutorials on Facebook"></a></div><nav id="breadcrumbs"><ul><li><a href="http://catlikecoding.com/">Catlike Coding</a></li><li><a href="http://catlikecoding.com/unity/">Unity</a></li><li><a href="http://catlikecoding.com/unity/tutorials/">Tutorials</a></li><li><a href="./Runner, a Unity C# Tutorial_files/Runner, a Unity C# Tutorial.htm">Runner</a></li></ul></nav><div class="numberflow-ad"><a href="http://catlikecoding.com/unity/products/numberflow/" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Self Ad&#39;, &#39;Follow&#39;]);"><b>NumberFlow</b><br>procedural texture editor for Unity</a></div></header>
+
+		<article class="tutorial" itemscope="" itemtype="http://schema.org/TechArticle">
+			<h1 itemprop="name headline">Runner<span>, a minimal side-scroller</span></h1>
+
+			<div class="instructions">
+				<span itemprop="about description">In this tutorial we'll create a very simple endless running game.</span>
+				You'll learn to
+				<ul>
+					<li>generate a layered background;</li>
+					<li>reuse objects;</li>
+					<li>use simple physics;</li>
+					<li>detect input to make the player jump;</li>
+					<li>implement a power-up;</li>
+					<li>write a small event manager;</li>
+					<li>switch stuff on and off on demand;</li>
+					<li>make a minimal GUI.</li>
+				</ul>
+				<p>
+				<span itemprop="dependencies">You're assumed to know your way around Unity's editor and know the basics of creating C# scripts.
+				If you've completed the <a href="http://catlikecoding.com/unity/tutorials/clock/">Clock</a> tutorial
+				you're good to go.</span> The <a href="http://catlikecoding.com/unity/tutorials/graphs/">Graphs</a> tutorial
+				is useful too, but not necessary.
+				</p><p>
+				Note that I will often omit chunks of code that have remained the same, only new code is shown. The context of the new code should be clear.
+			</p></div>
+			
+			<aside class="share"><div class="-share"><a href="https://twitter.com/share" class="twitter-share-button" data-via="catlikecoding" data-hashtags="Unity3D"></a></div><div class="-share"><div id="___plus_0" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 104px; height: 20px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 104px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I1_1392920107190" name="I1_1392920107190" src="./Runner, a Unity C# Tutorial_files/sharebutton.htm" data-gapiattached="true" title="+Partager"></iframe></div></div><div class="-share"><div class="fb-share-button" data-type="button_count"></div></div></aside>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/particles_in_action.png" width="560" height="350" itemprop="image">
+				<figcaption>You'll make a run for it.</figcaption>
+			</figure>
+			
+			<h2>Game Design</h2>
+
+			<div class="instructions">
+				Before we get started, we should make some decisions about what we put in the game. We're going to
+				make a very simple 2D side-scroller, but that's still very vague. Let's narrow it down a bit.
+				<p>
+				For gameplay, we'll have a runner who dashes towards
+				the right of the screen. The player needs to jump from platform to platform for as long as possible.
+				These platforms can come in different flavors, slowing down or speeding up the runner.
+				We'll also include a single power-up, which is a booster that allows mid-air jumps.
+				</p><p>
+				For graphics, we'll simply use cubes and standard particle systems. The cubes will be used for
+				the runner, power-up, platforms, and a skyline background. We'll use particle systems to add a trail
+				effect and lots of floating stuff to give a better sense of speed and depth.
+				</p><p>
+				There won't be any sound or music.
+				</p><p>
+				<button id="playerButton" onclick="Play(&#39;runner.unity3d&#39;, 800, 500);">Play the Game</button>
+			</p></div>
+
+			<script src="./Runner, a Unity C# Tutorial_files/UnityObject.js"></script>
+			<div id="player">
+				<div id="unityPlayer">
+					<div>
+						<a href="http://unity3d.com/webplayer/" title="Unity Web Player. Install now!">
+							<img alt="Unity Web Player. Install now!" src="./Runner, a Unity C# Tutorial_files/getunity.png" width="193" height="63">
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<h2>Setting the Scene</h2>
+
+			<div class="instructions">
+				Open a new project without any packages. The default <i class="name">2 by 3</i> editor layout is a good
+				one for this project, but you can use whatever layout you prefer. Let's make this game with a 16:10
+				display ratio in mind, so select this option in the <i class="view">Game</i> view.
+				<p>
+				Our game is basically 2D, but we want to keep a little feeling of 3D. An orthographic camera doesn't
+				allow for 3D, so we stick to a perspective camera. This way we can also get a multilayered scrolling
+				background by simply placing stuff at various distances. Let's say the foreground is at depth 0 and
+				we have a background layer at depth 50 and another one at depth 100. Let's place three cubes at these
+				depths and use them as guides to construct the scene. I went ahead and picked a view angle and color
+				setup, but you're free to experiment and choose whatever you like.
+				</p><p>
+				Add a directional light (<i class="menu">GameObject / Create Other / Directional Light</i>) with a
+				rotation of (20, 330, 0). This gives us a light source that's shining over our right shoulder.
+				Because it's a directional light its position doesn't matter.
+				</p><p>
+				Reduce the <i class="name">Field of View</i> of the <i class="name">Main Camera</i> to 30, position it
+				at (5, 15, -40), and rotate it by (20, 0, 0). Also change its <i class="name">Background</i> color to
+				(120, 180, 250).
+			</p></div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/light.png" alt="light" width="320" height="360">
+				<img src="./Runner, a Unity C# Tutorial_files/camera.png" alt="camera" width="320" height="480">
+				<figcaption>Light and camera.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				Create three cubes (<i class="menu">GameObject / Create Other / Cube</i>) with Z positions of 0, 50,
+				and 100. Call them <i class="name">Runner</i>, <i class="name">Skyline Close</i>, and
+				<i class="name">Skyline Far Away</i> respectively. Remove the collider from both skyline cubes,
+				because we won't be needing those.
+				<p>
+				Create a material for each in the
+				<i class="view">Project</i> view via <i class="menu">Create / Material</i>, naming them
+				<i class="name">Runner Mat</i> and so on, then assign them to the cubes by dragging. I used default
+				diffuse shaders with the colors white, (100, 120, 220), and (110, 140, 220).
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-collider" id="q-collider">What's a collider?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-removeColliders" id="q-removeColliders">Why remove the colliders?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-material" id="q-material">What's a material?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-color" id="q-color">What about the fourth color component?</a></li>
+				</ul>
+			</aside>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/runner.png" alt="runner" width="320" height="320"><br>
+				<img src="./Runner, a Unity C# Tutorial_files/skyline_close.png" alt="skyline close" width="320" height="300">
+				<img src="./Runner, a Unity C# Tutorial_files/skyline_far_away.png" alt="skyline far away" width="320" height="300">
+				<figcaption>The three cube configurations.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				To keep things organized, create a <i class="name">Runner</i> and a <i class="name">Skyline</i>
+				folder in the <i class="view">Project</i> view via <i class="menu">Create / Folder</i> and put the
+				materials in there.
+			</div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/project.png" alt="project" width="412" height="118">
+				<img src="./Runner, a Unity C# Tutorial_files/game_scene.png" alt="game scene" width="651" height="371">
+				<figcaption>Hierarchy, project, and game views.</figcaption>
+			</figure>
+
+			<h2>Running</h2>
+
+			<div class="instructions">
+				So far it doesn't look like much and nothing's happening yet, but that will change. Let's start by
+				creating a mock-up of the game in action by instructing the <i class="name">Runner</i> to move to the
+				right.
+				<p>
+				Create a new C# script called <i class="name">Runner</i> inside the <i class="name">Runner</i> folder
+				and attach it to our <i class="name">Runner</i> cube. Write the following code to make it move.
+			</p></div>
+
+			<pre><mark><b class="keyword">using</b> UnityEngine;</mark>
+
+<mark><b class="keyword">public</b> <b class="keyword">class</b> <b class="type">Runner</b> : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {</mark>
+
+	<mark><b class="keyword">void</b> Update () {</mark>
+		<mark>transform.Translate(<span class="constant">5f</span> * <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Time">Time</a>.deltaTime, <span class="constant">0f</span>, <span class="constant">0f</span>);</mark>
+	<mark>}</mark>
+<mark>}</mark></pre>
+
+			<div class="instructions">
+				While it's not much, it already shows us a problem when entering play mode. The camera does not
+				follow the cube. To fix this, drag <i class="name">Main Camera</i> onto <i class="name">Runner</i> so
+				is becomes a child of it.
+				<p>
+				Now <i class="name">Runner</i> remains at a fixed position in our view and we can see that the close
+				skyline cube appears to move faster than the one further away.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-child" id="q-child">What does it mean to be a child?</a></li>
+				</ul>
+			</aside>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/moving_camera.png" width="414" height="104">
+				<figcaption>Setup for moving camera.</figcaption>
+			</figure>
+
+			<h2>Generating a Skyline</h2>
+
+			<div class="instructions">
+				Now that we have rudimentary movement, let's generate a row of cubes to construct an endless skyline.
+				The	first thing we should realize is that only the visible part of the skyline needs to exist. As soon
+				as a cube falls off the left side of the screen, it can be destroyed. Or better yet, it can be reused to build
+				the next part of the skyline that's about to enter view. We can program this behaviour by generating a
+				queue of cubes and constantly moving the front cube to the back as soon as it's no longer visible.
+				<p>
+				Create a new C# script in the <i class="name">Skyline</i> folder and name it
+				<i class="name">SkylineManager</i>. We will use it to create two managers, one for each of the skyline
+				layers. At minimum, it needs to know which prefab to use to generate the skyline, so let's start by
+				adding a public variable for that.
+			</p></div>
+
+			<pre><mark><b class="keyword">using</b> UnityEngine;</mark>
+
+<mark><b class="keyword">public</b> <b class="keyword">class</b> <b class="type">SkylineManager</b> : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {</mark>
+
+	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> prefab;</mark>
+<mark>}</mark></pre>
+
+			<div class="instructions">
+				To keep things organized, create a new empty object (<i class="menu">GameObject / Create Empty</i>)
+				named <i class="name">Managers</i> which we'll use as a container for all of our manager objects.
+				Create another empty object named <i class="name">Skyline Close Manager</i>, make it a child of
+				<i class="name">Managers</i>, and create a <i class="name">SkylineManager</i> component for it by
+				dragging the script on it.
+				<p>
+				Now turn both skyline cubes into prefabs by dragging them into the <i class="name">Skyline</i> project
+				folder or via <i class="name">Create / Prefab</i> and then dragging onto that. Afterwards, delete both
+				cubes from the <i class="view">Hierarchy</i>. Now drag the <i class="name">Skyline Close</i> prefab
+				onto the <i class="name">Prefab</i> field of our <i class="name">Skyline Close Manager</i>.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-prefab" id="q-prefab">What's a prefab?</a></li>
+				</ul>
+			</aside>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/skyline_manager.png" width="784" height="154">
+				<figcaption>Manager and prefabs.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				We need a starting point from where we'll begin spawning cubes, so let's add a <i class="name">startPosition</i> variable.
+				We also need to determine how many cubes we need to spawn to fill the screen. Let's simply
+				use a variable named <i class="name">numberOfCubes</i> for that. To keep track of where the next cube
+				needs to spawn we'll use a private variable named <i class="name">nextPosition</i>.
+			</div>
+
+			<pre>	<b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> prefab;
+	<mark><b class="keyword">public</b> <b class="type">int</b> numberOfObjects;</mark>
+	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> startPosition;</mark>
+
+	<mark><b class="keyword">private</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> nextPosition;</mark>
+
+	<mark><b class="keyword">void</b> Start () {</mark>
+		<mark>nextPosition = startPosition;</mark>
+	<mark>}</mark></pre>
+			
+			<div class="instructions">
+				The next step is spawning the initial row of cubes. We'll use a simple loop for that, instantiating
+				new objects, setting their position, and advancing <i class="name">nextPosition</i> by the width of
+				the object so they form an unbroken line. Because we're using unit cubes, their with is equal to their <code>localScale.x</code>.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-instantiate" id="q-instantiate">What does <code>Instantiate</code> do?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-add" id="q-add">What does <code>+=</code> do?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<b class="keyword">void</b> Start () {
+		nextPosition = startPosition;
+		<mark><b class="keyword">for</b> (<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++) {</mark>
+			<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> o = (<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>)Instantiate(prefab);</mark>
+			<mark>o.localPosition = nextPosition;</mark>
+			<mark>nextPosition.x += o.localScale.x;</mark>
+		<mark>}</mark>
+	}</pre>
+
+			<div class="instructions">
+				Now set <i class="name">Start Position</i> to (0, -1, 0) and set
+				<i class="name">Number of Objects</i> to 10. When entering play mode, we'll see a short row
+				of cubes appear below <i class="name">Runner</i>. However, once the cubes move out of view we'll
+				never see them again.
+			</div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/skyline_manager_2.png" alt="manager" width="320" height="108">
+				<img src="./Runner, a Unity C# Tutorial_files/skyline.png" alt="skyline" width="171" height="71">
+				<figcaption>Instantiating a skyline.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				The idea is that we'll recyle objects once <i class="name">Runner</i> has moved past them by some
+				distance. For this to work, the manager must know how far <i class="name">Runner</i> has traveled.
+				We can provide for this by adding a static variable named <code>distanceTraveled</code> to
+				<code><b class="type">Runner</b></code> and making sure that it's always up to date.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-distanceTraveled" id="q-distanceTraveled">Why is <code>distanceTraveled</code> static?</a></li>
+				</ul>
+			</aside>
+
+			<pre><b class="keyword">using</b> UnityEngine;
+
+<b class="keyword">public</b> <b class="keyword">class</b> <b class="type">Runner</b> : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {
+
+	<mark><b class="keyword">public</b> <b class="keyword">static</b> <b class="type">float</b> distanceTraveled;</mark>
+
+	<b class="keyword">void</b> Update () {
+		transform.Translate(<span class="constant">5f</span> * <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Time">Time</a>.deltaTime, <span class="constant">0f</span>, <span class="constant">0f</span>);
+		<mark>distanceTraveled = transform.localPosition.x;</mark>
+	}
+}</pre>
+
+			<div class="instructions">
+				Now we'll store our skyline objects in a queue and keep checking whether the first object in it
+				should be recycled. If so, we'll reposition it and move it to the back of the queue. Let's use a
+				<i class="name">recycleOffset</i> variable to configure how far behind <i class="name">Runner</i> this
+				reuse should occur. Set it to 10 for now.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-queue" id="q-queue">What's a <code><a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a></code>?</a></li>
+				</ul>
+			</aside>
+
+			<pre><b class="keyword">using</b> UnityEngine;
+<mark><b class="keyword">using</b> System.Collections.Generic;</mark>
+
+<b class="keyword">public</b> <b class="keyword">class</b> <b class="type">SkylineManager</b> : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {
+
+	<b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> prefab;
+	<b class="keyword">public</b> <b class="type">int</b> numberOfObjects;
+	<mark><b class="keyword">public</b> <b class="type">float</b> recycleOffset;</mark>
+	<b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> startPosition;
+
+	<b class="keyword">private</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> nextPosition;
+	<mark><b class="keyword">private</b> <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a>&lt;<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>&gt; objectQueue;</mark>
+
+	<b class="keyword">void</b> Start () {
+		<mark>objectQueue = <b class="keyword">new</b> <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a>&lt;<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>&gt;(numberOfObjects);</mark>
+		nextPosition = startPosition;
+		<b class="keyword">for</b> (<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++) {
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> o = (<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>)Instantiate(prefab);
+			o.localPosition = nextPosition;
+			nextPosition.x += o.localScale.x;
+			<mark>objectQueue.Enqueue(o);</mark>
+		}
+	}
+
+	<mark><b class="keyword">void</b> Update () {</mark>
+		<mark><b class="keyword">if</b> (objectQueue.Peek().localPosition.x + recycleOffset &lt; <b class="type">Runner</b>.distanceTraveled) {</mark>
+			<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> o = objectQueue.Dequeue();</mark>
+			<mark>o.localPosition = nextPosition;</mark>
+			<mark>nextPosition.x += o.localScale.x;</mark>
+			<mark>objectQueue.Enqueue(o);</mark>
+		<mark>}</mark>
+	<mark>}</mark>
+}</pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/skyline_manager_3.png" width="320" height="126">
+				<figcaption>Recycling skyline configuration.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				This works! After entering play mode, you'll see the cubes reposition themselves. However, it
+				doesn't look much like a skyline yet. To make it more like a real irregular skyline, let's randomly
+				scale the cubes whenever they're placed or recycled.
+				<p>
+				First, consider that both initially placing and later recycling a cube is basically doing the same
+				thing. Let's put this code in its own <code>Recycle</code> method and rewrite our <code>Start</code>
+				and <code>Update</code> methods to both use it.
+			</p></div>
+
+			<pre>	<b class="keyword">void</b> Start () {
+		objectQueue = <b class="keyword">new</b> <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a>&lt;<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>&gt;(numberOfObjects);
+		<mark><b class="keyword">for</b> (<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++) {</mark>
+			<mark>objectQueue.Enqueue(</mark>(<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>)Instantiate(prefab)<mark>);</mark>
+		<mark>}</mark>
+		nextPosition = startPosition;
+		<b class="keyword">for</b> (<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++) {
+			<mark>Recycle();</mark>
+		}
+	}
+
+	<b class="keyword">void</b> Update () {
+		<b class="keyword">if</b> (objectQueue.Peek().localPosition.x + recycleOffset &lt; <b class="type">Runner</b>.distanceTraveled) {
+			<mark>Recycle();</mark>
+		}
+	}
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> Recycle () {</mark>
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> o = objectQueue.Dequeue();
+		o.localPosition = nextPosition;
+		nextPosition.x += o.localScale.x;
+		objectQueue.Enqueue(o);
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				Next, we'll introduce two variables to configure the maximum and minimum allowed size and use them
+				to randomly scale our objects. After picking a scale, we'll make sure to position the object so they're
+				all aligned at the bottom. For that we'll need to offset by half their size, because the objects are centered around their position.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-random" id="q-random">What does <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range</code> do?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> minSize, maxSize;</mark>
+
+	<b class="keyword">private</b> <b class="keyword">void</b> Recycle () {
+		<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> scale = <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(</mark>
+			<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.x, maxSize.x),</mark>
+			<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.y, maxSize.y),</mark>
+			<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.z, maxSize.z));</mark>
+
+		<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> position = nextPosition;</mark>
+		<mark>position.x += scale.x * <span class="constant">0.5f</span>;</mark>
+		<mark>position.y += scale.y * <span class="constant">0.5f</span>;</mark>
+
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> o = objectQueue.Dequeue();
+		o.localScale = <mark>scale</mark>;
+		o.localPosition = <mark>position</mark>;
+		nextPosition.x += <mark>scale.x</mark>;
+		objectQueue.Enqueue(o);
+	}</pre>
+			<div class="instructions">
+				To get a nice skyline effect, set <i class="name">Start Position</i> to (-60, -60, 50), set <i class="name">Min Size</i>
+				to (10, 20, 10), set <i class="name">Max Size</i> to (30, 60, 10), and set
+				<i class="name">Recycle Offset</i> to 60.
+				<p>
+				Let's go ahead and add the second skyline layer as well. Duplicate
+				<i class="name">Skyline Close Manager</i>
+				and change its name to <i class="name">Skyline Far Away Manager</i>. Change its
+				<i class="name">Prefab</i> to the <i class="name">Skyline Far Away</i> prefab. Set its <i class="name">Start Position</i> to
+				(-100, -100, 100), its <i class="name">Recycle Offset</i> to 75, its <i class="name">Min Size</i> to
+				(10, 50, 10), and its <i class="name">Max Size</i> to (30, 100, 10). Of course you can use any
+				values you like instead.
+			</p></div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/managers.png" alt="managers" width="180" height="88">
+				<img src="./Runner, a Unity C# Tutorial_files/skyline_close_manager.png" alt="skyline close manager" width="320" height="254">
+				<img src="./Runner, a Unity C# Tutorial_files/skyline_far_away_manager.png" alt="skyline far away manager" width="320" height="254">
+				<img src="./Runner, a Unity C# Tutorial_files/skylines.png" alt="skylines" width="565" height="352">
+				<figcaption>The complete skyline.</figcaption>
+			</figure>
+
+			<h2>Generating Platforms</h2>
+
+			<div class="instructions">
+				Adding platforms to the game is basically doing the same thing as generating a skyline, with only a few
+				differences. The elevation of the platforms needs to change at random and there need to be gaps between
+				them. Also, we want to constrain the elevation of the platforms to make sure our skyline remains
+				properly in view. If a platform is placed outside this range, we should bounce it back.
+				<p>
+				Create a new folder in the <i class="view">Project</i> view named <i class="name">Platform</i>. Create
+				a new C# script in there called <i class="name">PlatformManager</i> and copy the code from
+				<i class="name">SkylineManager</i> into it. Then change the code as shown below to make if conform
+				to our needs.
+			</p></div>
+
+			<pre><b class="keyword">using</b> UnityEngine;
+<b class="keyword">using</b> System.Collections.Generic;
+
+<b class="keyword">public</b> <b class="keyword">class</b> <mark><b class="type">PlatformManager</b></mark> : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {
+
+	<b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> prefab;
+	<b class="keyword">public</b> <b class="type">int</b> numberOfObjects;
+	<b class="keyword">public</b> <b class="type">float</b> recycleOffset;
+	<b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> startPosition;
+	<b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> minSize, maxSize<mark>, minGap, maxGap</mark>;
+	<mark><b class="keyword">public</b> <b class="type">float</b> minY, maxY;</mark>
+
+	<b class="keyword">private</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> nextPosition;
+	<b class="keyword">private</b> <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a>&lt;<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>&gt; objectQueue;
+
+	<b class="keyword">void</b> Start () {
+		objectQueue = <b class="keyword">new</b> <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a>&lt;<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>&gt;(numberOfObjects);
+		<b class="keyword">for</b>(<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++){
+			objectQueue.Enqueue((<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>)Instantiate(prefab));
+		}
+		nextPosition = startPosition;
+		<b class="keyword">for</b>(<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++){
+			Recycle();
+		}
+	}
+
+	<b class="keyword">void</b> Update () {
+		<b class="keyword">if</b>(objectQueue.Peek().localPosition.x + recycleOffset &lt; <b class="type">Runner</b>.distanceTraveled){
+			Recycle();
+		}
+	}
+
+	<b class="keyword">private</b> <b class="keyword">void</b> Recycle () {
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> scale = <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.x, maxSize.x),
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.y, maxSize.y),
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.z, maxSize.z));
+
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> position = nextPosition;
+		position.x += scale.x * <span class="constant">0.5f</span>;
+		position.y += scale.y * <span class="constant">0.5f</span>;
+
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> o = objectQueue.Dequeue();
+		o.localScale = scale;
+		o.localPosition = position;
+		objectQueue.Enqueue(o);
+
+		<mark>nextPosition += <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(</mark>
+			<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.x, maxGap.x) + scale.x,</mark>
+			<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.y, maxGap.y),</mark>
+			<mark><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.z, maxGap.z));</mark>
+
+		<mark><b class="keyword">if</b>(nextPosition.y &lt; minY){</mark>
+			<mark>nextPosition.y = minY + maxGap.y;</mark>
+		<mark>}</mark>
+		<mark><b class="keyword">else</b> <b class="keyword">if</b>(nextPosition.y &gt; maxY){</mark>
+			<mark>nextPosition.y = maxY - maxGap.y;</mark>
+		<mark>}</mark>
+	}
+}
+</pre>
+
+			<div class="instructions">
+				Now let's make a prefab for the platforms, along with a material for it. You can do this
+				by duplicating one of the skyline materials and changing its color to (255, 60, 255). Call it
+				<i class="name">Platform Regular Mat</i>. Then create
+				a new cube, assign the material to it, and turn it into a prefab called <i class="name">Platform</i>.
+				Put them both in the <i class="name">Platform</i> folder.
+			</div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/project_platform.png" width="554" height="260">
+				<figcaption>Platform prefab.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				Also create a new empty object named <i class="name">Platform Manager</i> and make it a child of
+				<i class="name">Managers</i>. Give it a <i class="name">Platform Manager</i> component by draggin
+				the script onto it.
+				Assign our new
+				<i class="name">Platform</i> prefab to its <i class="name">Prefab</i> field. Set its
+				<i class="name">Number Of Objects</i> to 6, its <i class="name">Recycle Offset</i> to 20,
+				its <i class="name">Start Position</i> to (0, 0, 0), its
+				<i class="name">Min Size</i> to (5, 1, 1), and its <i class="name">Max Size</i> to (10, 1, 1).
+				Then set the new fields <i class="name">Min Gap</i>, <i class="name">Max Gap</i>,
+				<i class="name">Min Y</i>, and <i class="name">Max Y</i> to (2, -1.5, 0), (4, 1.5, 0), -5, and 10
+				respectively. Once again, you can experiment with different settings.
+			</div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/platform_manager.png" alt="platform manager" width="320" height="358">
+				<img src="./Runner, a Unity C# Tutorial_files/managers_2.png" alt="managers" width="228" height="116">
+				<figcaption>Platform manager.</figcaption>
+			</figure>
+
+			<h2>Jumping and Falling</h2>
+
+			<div class="instructions">
+				Now that we have platforms, it's time to upgrade our runner. We'll use Unity's physics engine to make
+				it jump, fall, and collide with the platforms, so add a <i class="name">Rigidbody</i> component to
+				<i class="name">Runner</i> via <i class="menu">Component / Physics / Rigidbody</i>. We don't want it
+				to rotate or disappear into the distance, so constrain it by freezing its Z position and all rotation
+				axes.
+				<p>
+				As movement will be accomplished by gliding across the platforms, let's create a physic material
+				(<i class="menu">Create / Physic Material</i>)
+				with no friction whatsoever. Set all its fields to zero and both combine options to maximum. This way
+				friction will be determined by whatever it's gliding across.
+				</p><p>
+				Name the new physic material <i class="name">Runner PMat</i>, put it in the <i class="name">Runner</i>
+				folder, and assign it to the <i class="name">Material</i> field of the
+				<i class="name">Box Collider</i> of <i class="name">Runner</i>.
+				</p><p>
+				Reposition <i class="name">Runner</i> to (0, 2, 0) so that it will begin by falling down on the first
+				platform. Then try out play mode to see what happens!
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-rigidbody" id="q-rigidbody">What's a rigidbody?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-physicMaterial" id="q-physicMaterial">What's a physic material?</a></li>
+				</ul>
+			</aside>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/runner_2.png" alt="runner" width="306" height="520">
+				<img src="./Runner, a Unity C# Tutorial_files/runner_pmat.png" alt="material" width="554" height="212">
+				<img src="./Runner, a Unity C# Tutorial_files/runner_weird.png" alt="game" width="188" height="135">
+				<figcaption>Runner with physics.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				So <i class="name">Runner</i> falls on the platform and then moves to the right. It even falls again
+				after it moves past the platform. But when it happens to collide with the side of the next platform it
+				behaves a bit weird. This is because we're still changing its position in an <code>Update</code>
+				method. We should leave its movement to the physics engine and instead apply forces to it.
+				<p>
+				Remove the call to <code>Translate</code> from the <code>Update</code> method of <code><b class="type">Runner</b></code>.
+				Instead, we'll use two of Unity's collision event methods – <code>OnCollisionEnter</code> and
+				<code>OnCollisionExit</code> – to detect when we touch or leave a platform.
+				As long as we're touching a platform, we apply an acceleration to make us run faster.
+				</p><p>
+				Let's make the acceleration configurable and set it to 5 in the editor.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-fixedUpdate" id="q-fixedUpdate">When is <code>FixedUpdate</code> called?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-addForce" id="q-addForce">What does <code>AddForce</code> do?</a></li>
+				</ul>
+			</aside>
+
+			<pre><b class="keyword">using</b> UnityEngine;
+
+<b class="keyword">public</b> <b class="keyword">class</b> <b class="type">Runner</b> : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {
+
+	<b class="keyword">public</b> <b class="keyword">static</b> <b class="type">float</b> distanceTraveled;
+
+	<mark><b class="keyword">public</b> <b class="type">float</b> acceleration;</mark>
+
+	<mark><b class="keyword">private</b> <b class="type">bool</b> touchingPlatform;</mark>
+
+	<b class="keyword">void</b> Update () {
+		distanceTraveled = transform.localPosition.x;
+	}
+
+	<mark><b class="keyword">void</b> FixedUpdate () {</mark>
+		<mark><b class="keyword">if</b>(touchingPlatform){</mark>
+			<mark>rigidbody.AddForce(acceleration, <span class="constant">0f</span>, <span class="constant">0f</span>, <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.Acceleration);</mark>
+		<mark>}</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">void</b> OnCollisionEnter () {</mark>
+		<mark>touchingPlatform = <b class="keyword">true</b>;</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">void</b> OnCollisionExit () {</mark>
+		<mark>touchingPlatform = <b class="keyword">false</b>;</mark>
+	<mark>}</mark>
+}
+</pre>
+
+			<div class="instructions">
+				One more thing we need to do before this works is assign a physic material to out platforms.
+				Duplicate <i class="name">Runner PMat</i>, rename it to <i class="name">Platform Regular PMat</i>
+				and move it to the <i class="name">Platform</i> folder. Set both friction fields to 0.05 and drag
+				the physic material onto the <i class="name">Platform</i> prefab.
+				<p>
+				Now our platforms provide a little friction, but <i class="name">Runner</i> has a large enough
+				acceleration pick up speed while moving across them.
+			</p></div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/runner_acceleration.png" alt="acceleration" width="320" height="174">
+				<img src="./Runner, a Unity C# Tutorial_files/platform_2.png" alt="platform" width="320" height="204">
+				<img src="./Runner, a Unity C# Tutorial_files/platform_regular_pmat.png" alt="physic material" width="554" height="212">
+				<figcaption>Acceleration and regular platform.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				To make <i class="name">Runner</i> jump, we need to detect the player's input. Unity's
+				default settings for the jump action, found under <i class="menu">Edit / Project Settings / Input</i>,
+				is to be triggered by pressing the space bar. We'll use that, and also configure 'x' as an alternative
+				by putting it in the <i class="name">Alt Positive Button</i> fied.
+			</div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/input.png" width="320" height="626">
+				<figcaption>Jump input configuration.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				We'll add a variable to <code><b class="type">Runner</b></code> so we can configure its jump velocity. We'll use a vector
+				instead of just a float so we can profide both a vertical and horizontal component. Set the
+				corresponding field in the editor to (1, 7, 0).
+				<p>
+				We want <i class="name">Runner</i> to jump only when it's touching a platform while the jump button is
+				pressed. Let's add code for this to the <code>Update</code> method.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-andAlso" id="q-andAlso">What does <code>&amp;&amp;</code> do?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-getButtonDown" id="q-getButtonDown">What does <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a>.GetButtonDown</code> do?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-jumpVelocity" id="q-jumpVelocity">Shouldn't the jump be in <code>FixedUpdate</code>?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> jumpVelocity;</mark>
+
+	<b class="keyword">void</b> Update () {
+		<mark><b class="keyword">if</b>(touchingPlatform &amp;&amp; <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a>.GetButtonDown(<span class="constant">"Jump"</span>)){</mark>
+			<mark>rigidbody.AddForce(jumpVelocity, <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.VelocityChange);</mark>
+		<mark>}</mark>
+		distanceTraveled = transform.localPosition.x;
+	}</pre>
+			
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/runner_jump.png" alt="settings" width="320" height="206">
+				<img src="./Runner, a Unity C# Tutorial_files/runner_jumping.png" alt="game" width="187" height="132">
+				<figcaption>Runner jumping.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				Now we can jump! However, if <i class="name">Runner</i> hits a platform from the side, we can
+				perform multiple jumps while it's still touching the platform, launching ourselves out of the gap.
+				To prevent this, we'll decree that once jumped we are no longer touching the platform, even if we
+				really are. This allows for one jump after colliding, which usually isn't enough to escape from a gap.
+			</div>
+
+			<pre>	<b class="keyword">void</b> Update () {
+		<b class="keyword">if</b>(touchingPlatform &amp;&amp; <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a>.GetButtonDown(<span class="constant">"Jump"</span>)){
+			rigidbody.AddForce(jumpVelocity, <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.VelocityChange);
+			<mark>touchingPlatform = <b class="keyword">false</b>;</mark>
+		}
+		distanceTraveled = transform.localPosition.x;
+	}</pre>
+
+			<h2>Platform Variety</h2>
+
+			<div class="instructions">
+				To spice things up, let's add two new platform types. One slows <i class="name">Runner</i> down a bit,
+				while the other speeds it up. We'll accomplish this by adding two physic materials, accompanied by
+				two new colors, and pick which to use per platform at random.
+				<p>
+				Duplicate <i class="name">Platform Regular PMat</i> twice and name them
+				<i class="name">Platform Slowdown PMat</i> and <i class="name">Platform Speedup PMat</i>. Also
+				duplicate <i class="name">Platform Regular Mat</i> twice and name them in a similar fashion. Set
+				the friction values to 0.15 and 0, and their colors to (255, 255, 0) and (60, 130, 255), respectively.
+			</p></div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/platform_slowdown_pmat.png" alt="slowdown physic material" width="320" height="212">
+				<img src="./Runner, a Unity C# Tutorial_files/platform_speedup_pmat.png" alt="speedup physic material" width="320" height="212">
+				<br><img src="./Runner, a Unity C# Tutorial_files/platform_slowdown_mat.png" alt="slowdown material" width="320" height="136">
+				<img src="./Runner, a Unity C# Tutorial_files/platform_speedup_mat.png" alt="speedup material" width="320" height="136">
+				<br><img src="./Runner, a Unity C# Tutorial_files/project_platforms.png" alt="hierarchy" width="230" height="214">
+				<figcaption>Slowdown and speedup platforms.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				We now have to modify <code><b class="type">PlatformManager</b></code> so it will assign these materials. We'll add two
+				arrays for the materials and pick from them at random when recycling a platform.
+			</div>
+
+			<pre>	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Material.html">Material</a>[] materials;</mark>
+	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/PhysicMaterial.html">PhysicMaterial</a>[] physicMaterials;</mark>
+
+	<b class="keyword">private</b> <b class="keyword">void</b> Recycle () {
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> scale = <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.x, maxSize.x),
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.y, maxSize.y),
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.z, maxSize.z));
+
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> position = nextPosition;
+		position.x += scale.x * <span class="constant">0.5f</span>;
+		position.y += scale.y * <span class="constant">0.5f</span>;
+
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> o = objectQueue.Dequeue();
+		o.localScale = scale;
+		o.localPosition = position;
+		<mark><b class="type">int</b> materialIndex = <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(<span class="constant">0</span>, materials.Length);</mark>
+		<mark>o.renderer.material = materials[materialIndex];</mark>
+		<mark>o.collider.material = physicMaterials[materialIndex];</mark>
+		objectQueue.Enqueue(o);
+
+		nextPosition += <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.x, maxGap.x) + scale.x,
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.y, maxGap.y),
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.z, maxGap.z));
+
+		<b class="keyword">if</b>(nextPosition.y &lt; minY){
+			nextPosition.y = minY + maxGap.y;
+		}
+		<b class="keyword">else</b> <b class="keyword">if</b>(nextPosition.y &gt; maxY){
+			nextPosition.y = maxY - maxGap.y;
+		}
+	}
+}</pre>
+
+			<div class="instructions">
+				Now it's a matter of assigning stuff to the arrays, either by dragging or by setting the array's size
+				and using the dots. Make sure that both arrays are ordered the same way. Furthermore, if we'd like
+				some platform types to be more common than others, simply include
+				them multiple times. By including the regular materials twice and the others just once, the regular
+				option has a 50% chance of occurring, while the others have a 25% chance each.
+			</div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/platform_manager_arrays.png" alt="settings" width="320" height="574">
+				<img src="./Runner, a Unity C# Tutorial_files/platform_variety.png" alt="game" width="444" height="164">
+				<figcaption>Platform variety.</figcaption>
+			</figure>
+
+			<h2>Game Events</h2>
+
+			<div class="instructions">
+				Right now, the game starts as soon as we enter play mode and it doesn't end at all. What we want
+				instead is that the game begins with a title screen and ends with a game over notice, where pressing
+				one of the jump buttons starts a new game.
+				<p>
+				For this approach we can identify three events that might require objects to take action. The first,
+				game launch, is effectively handled by the <code>Start</code> methods. The other two, game start and
+				game over, require a custom approach. We will create a very simple event manager class to handle them.
+				</p><p>
+				Create a new folder named <i class="name">Managers</i> and put a new C# script named
+				<i class="name">GameEventManager</i> in it. We make <code><b class="type">GameEventManager</b></code> a static class
+				that defines a <code><b class="type">GameEvent</b></code> delegate type inside it. Note that the manager isn't a
+				<code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a></code> and won't be attached to any Unity object.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-staticClass" id="q-staticClass">Why is the class static?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-delegate" id="q-delegate">What's a <code><b class="keyword">delegate</b></code>?</a></li>
+				</ul>
+			</aside>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/project_game_event_manager.png" width="230" height="116">
+				<figcaption>Game event manager.</figcaption>
+			</figure>
+
+			<pre><mark><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">class</b> <b class="type">GameEventManager</b> {</mark>
+
+	<mark><b class="keyword">public</b> <b class="keyword">delegate</b> <b class="keyword">void</b> <b class="type">GameEvent</b>();</mark>
+<mark>}</mark></pre>
+
+			<div class="instructions">
+				Next, we use the new <code>gameEvent</code> type to add two events to our manager,
+				<code>GameStart</code> and <code>GameEnd</code>. Now other scripts can subscribe to these events by
+				assigning methods to them, which will be called when the events are triggered.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-event" id="q-event">What's an <code><b class="keyword">event</b></code>?</a></li>
+				</ul>
+			</aside>
+
+			<pre><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">class</b> <b class="type">GameEventManager</b> {
+
+	<b class="keyword">public</b> <b class="keyword">delegate</b> <b class="keyword">void</b> <b class="type">GameEvent</b>();
+
+	<mark><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">event</b> <b class="type">GameEvent</b> GameStart, GameOver;</mark>
+}</pre>
+
+			<div class="instructions">
+				Finally, we need to include a way to trigger these events. We'll add two methods for this.
+				Care should be taken to only call an event if anyone is subscribed to it, otherwise
+				it will be <code><b class="keyword">null</b></code> and the call will result in an error.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-null" id="q-null">What's <code><b class="keyword">null</b></code>?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-notEqual" id="q-notEqual">What does <code>!=</code> do?</a></li>
+				</ul>
+			</aside>
+
+			<pre><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">class</b> <b class="type">GameEventManager</b> {
+
+	<b class="keyword">public</b> <b class="keyword">delegate</b> <b class="keyword">void</b> <b class="type">GameEvent</b>();
+
+	<b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">event</b> <b class="type">GameEvent</b> GameStart, GameOver;
+
+	<mark><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">void</b> TriggerGameStart(){</mark>
+		<mark><b class="keyword">if</b>(GameStart != <b class="keyword">null</b>){</mark>
+			<mark>GameStart();</mark>
+		<mark>}</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">void</b> TriggerGameOver(){</mark>
+		<mark><b class="keyword">if</b>(GameOver != <b class="keyword">null</b>){</mark>
+			<mark>GameOver();</mark>
+		<mark>}</mark>
+	<mark>}</mark>
+}</pre>
+
+			<h2>GUI and Game Start</h2>
+
+			<div class="instructions">
+				Now that we have a game start event, let's create a GUI and a manager that uses it.
+				<p>
+				Let's add some text labels to our scene. To keep things organized, we'll use a container object
+				to group them, so create a new empty game object with position (0, 0, 0) and name it
+				<i class="name">GUI</i>. Create three empty child objects for it and give each a
+				<i class="name">GUIText</i> component via <i class="menu">Component / Rendering / GUIText</i>.
+				Set their <i class="name">Anchor</i> fields to <i class="name">middle center</i> so their text gets
+				centered on their position.
+				</p><p>
+				Name the first object <i class="name">Game Over Text</i>, set its <i class="name">Text</i> field to
+				"GAME OVER", set its <i class="name">Font Size</i> to 40, and set its <i class="name">Font Style</i> to
+				bold. Change its position to (0.5, 0.2, 0) so it ends up near the bottom center of the screen.
+				</p><p>
+				Name the second object <i class="name">Instructions Text</i>, also bold but with a font size of 20, and
+				set its text to "press Jump (x or space) to play". Change its position to (0.5, 0.1, 0), just below
+				the game over text.
+				</p><p>
+				Name the third object <i class="name">Runner Text</i>, with text "RUNNER", bold, and a font size of 60.
+				It's position should be (0.5, 0.5, 0), right in the middle of the screen.
+				</p><p>
+				Now create a C# script named <i class="name">GUIManager</i> in the <i class="name">Managers</i> folder
+				and give it a <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/GUIText.html">GUIText</a></code> variable for each text object we just made. Create a new object
+				named <i class="name">GUI Manager</i> and assign the script as a component. Make it a child of
+				<i class="name">Managers</i>. Then assign the text objects to the manager's corresponding fields.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-guiText" id="q-guiText">What's with the text positions?</a></li>
+				</ul>
+			</aside>
+
+			<pre><mark><b class="keyword">using</b> UnityEngine;</mark>
+
+<mark><b class="keyword">public</b> <b class="keyword">class</b> <b class="type">GUIManager</b> : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {</mark>
+
+	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/GUIText.html">GUIText</a> gameOverText, instructionsText, runnerText;</mark>
+<mark>}</mark></pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/game_over_text.png" alt="game over" width="320" height="384">
+				<img src="./Runner, a Unity C# Tutorial_files/instructions_text.png" alt="instructions" width="320" height="384">
+				<img src="./Runner, a Unity C# Tutorial_files/runner_text.png" alt="title" width="320" height="384">
+				<img src="./Runner, a Unity C# Tutorial_files/gui_manager.png" alt="manager" width="784" height="208">
+				<img src="./Runner, a Unity C# Tutorial_files/gui.png" alt="gui" width="430" height="248">
+				<figcaption>GUI Text.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				Now add a <code>Start</code> method to our new manager and use it to disable <code>gameOverText</code>
+				so it won't be shown anymore. Also add an <code>Update</code> method that checks whether a jump button
+				was pressed, and if so triggers the game-start event.
+			</div>
+
+			<pre>	<mark><b class="keyword">void</b> Start () {</mark>
+		<mark>gameOverText.enabled = <b class="keyword">false</b>;</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">void</b> Update () {</mark>
+		<mark><b class="keyword">if</b>(<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a>.GetButtonDown(<span class="constant">"Jump"</span>)){</mark>
+			<mark><b class="type">GameEventManager</b>.TriggerGameStart();</mark>
+		<mark>}</mark>
+	<mark>}</mark></pre>
+			
+			<div class="instructions">
+				Now it's time to include a method to handle our game-start event, let's appropriately name it
+				<code>GameStart</code>. We use this method to disable all text. We also disable the manager itself,
+				so its <code>Update</code> method will no longer be called. If we didn't, each time we jump there'd
+				be a new game-start event.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-triggerAndHandle" id="q-triggerAndHandle">Why trigger and handle the same event?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameStart () {</mark>
+		<mark>gameOverText.enabled = <b class="keyword">false</b>;</mark>
+		<mark>instructionsText.enabled = <b class="keyword">false</b>;</mark>
+		<mark>runnerText.enabled = <b class="keyword">false</b>;</mark>
+		<mark>enabled = <b class="keyword">false</b>;</mark>
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				The last step is informing our event manager that it should call the <code>GameStart</code> method of
+				our manager object, whenever the game-start event is triggered. We do this by adding our method
+				to the event in the <code>Start</code> method.
+			</div>
+
+			<pre>	<b class="keyword">void</b> Start () {
+		<mark><b class="type">GameEventManager</b>.GameStart += GameStart;</mark>
+		gameOverText.enabled = <b class="keyword">false</b>;
+	}</pre>
+
+			<h2>Game Over</h2>
+
+			<div class="instructions">
+				Let's also add a handler for the game-over event to our gui manager. We go about the same way as for
+				the game start event, but in this case we need to enable the manager again, along with the
+				instructions and game over text.
+			</div>
+
+			<pre>	<b class="keyword">void</b> Start () {
+		<b class="type">GameEventManager</b>.GameStart += GameStart;
+		<mark><b class="type">GameEventManager</b>.GameOver += GameOver;</mark>
+		gameOverText.enabled = <b class="keyword">false</b>;
+	}
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameOver () {</mark>
+		<mark>gameOverText.enabled = <b class="keyword">true</b>;</mark>
+		<mark>instructionsText.enabled = <b class="keyword">true</b>;</mark>
+		<mark>enabled = <b class="keyword">true</b>;</mark>
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				The game over event should be triggered whenever <i class="name">Runner</i> falls below the
+				platforms. We'll simply add a <i class="name">Game Over Y</i> field to <code><b class="type">Runner</b></code> with a value of -6,
+				then check each update whether we dropped below it. If so, we trigger the game over event.
+			</div>
+
+			<pre>	<mark><b class="keyword">public</b> <b class="type">float</b> gameOverY;</mark>
+
+	<b class="keyword">void</b> Update () {
+		<b class="keyword">if</b>(touchingPlatform &amp;&amp; <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a>.GetButtonDown(<span class="constant">"Jump"</span>)){
+			rigidbody.AddForce(jumpVelocity, <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.VelocityChange);
+			touchingPlatform = <b class="keyword">false</b>;
+		}
+		distanceTraveled = transform.localPosition.x;
+
+		<mark><b class="keyword">if</b>(transform.localPosition.y &lt; gameOverY){</mark>
+			<mark><b class="type">GameEventManager</b>.TriggerGameOver();</mark>
+		<mark>}</mark>
+	}</pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/runner_game_over_y.png" width="320" height="226">
+				<figcaption>Game over threshold.</figcaption>
+			</figure>
+
+			<h2>Using the Events</h2>
+
+			<div class="instructions">
+				Now that our game events are triggered correctly, it's time for <i class="name">Runner</i> to take
+				them into account.
+				<p>
+				We want <code><b class="type">Runner</b></code> to be disabled before the first game is started, though we want the camera inside of it to stay active.
+				Disabling the runner means we have to deactivate its renderer and the runner component itself. We also switch its rigidbody to kinematic mode to freeze it in place.
+				We can do this in its <code>Start</code> method, then undo this change when the game-start
+				event is triggered, and then redo it when the game-over event is triggered. We'll also remember its starting position so we can reset it each game start.
+				Let's reset <code>distanceTraveled</code> too, so it's immediately up to date.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-resetDistance" id="q-resetDistance">Why immediately reset the distance?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-kinematic" id="q-kinematic">What does it mean to be kinematic?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<mark><b class="keyword">private</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> startPosition;</mark>
+
+	<mark><b class="keyword">void</b> Start () {</mark>
+		<mark><b class="type">GameEventManager</b>.GameStart += GameStart;</mark>
+		<mark><b class="type">GameEventManager</b>.GameOver += GameOver;</mark>
+		<mark>startPosition = transform.localPosition;</mark>
+		<mark>renderer.enabled = <b class="keyword">false</b>;</mark>
+		<mark>rigidbody.isKinematic = <b class="keyword">true</b>;</mark>
+		<mark>enabled = <b class="keyword">false</b>;</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameStart () {</mark>
+		<mark>distanceTraveled = <span class="constant">0f</span>;</mark>
+		<mark>transform.localPosition = startPosition;</mark>
+		<mark>renderer.enabled = <b class="keyword">true</b>;</mark>
+		<mark>rigidbody.isKinematic = <b class="keyword">false</b>;</mark>
+		<mark>enabled = <b class="keyword">true</b>;</mark>
+	<mark>}</mark>
+	
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameOver () {</mark>
+		<mark>renderer.enabled = <b class="keyword">false</b>;</mark>
+		<mark>rigidbody.isKinematic = <b class="keyword">true</b>;</mark>
+		<mark>enabled = <b class="keyword">false</b>;</mark>
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				Now <i class="name">Runner</i> reacts properly to the game events, but once the first platform has been recycled all new games will be over rather quickly, as <i class="name">Runner</i> immediately plummets.  Let's modify our platform manager so it
+				reacts to the events as well. It should only be enabled when a game is in progress and
+				the platforms should only become visible after the first game start event has been triggered.
+				<p>
+				We can achieve this by having <code><b class="type">PlatformManager</b></code> initially place the platforms somewhere far behind the camera and
+				relocating its recycle loop to a new <code>GameStart</code> method.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-quaternionIdentity" id="q-quaternionIdentity">What's <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Quaternion.html">Quaternion</a>.identity</code>?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<b class="keyword">void</b> Start () {
+		<mark><b class="type">GameEventManager</b>.GameStart += GameStart;</mark>
+		<mark><b class="type">GameEventManager</b>.GameOver += GameOver;</mark>
+		objectQueue = <b class="keyword">new</b> <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a>&lt;<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>&gt;(numberOfObjects);
+		<b class="keyword">for</b> (<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++) {
+			objectQueue.Enqueue((<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>)Instantiate(
+				prefab<mark>, <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(<span class="constant">0f</span>, <span class="constant">0f</span>, -<span class="constant">100f</span>), <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Quaternion.html">Quaternion</a>.identity</mark>));
+		}
+		<mark>enabled = <b class="keyword">false</b>;</mark>
+	}
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameStart () {</mark>
+		nextPosition = startPosition;
+		<b class="keyword">for</b>(<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++){
+			Recycle();
+		}
+		<mark>enabled = <b class="keyword">true</b>;</mark>
+	}
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameOver () {</mark>
+		<mark>enabled = <b class="keyword">false</b>;</mark>
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				Now give <code><b class="type">SkylineManager</b></code> the exact same treatment, so all parts of the game respond nicely
+				to our events.
+			</div>
+
+			<pre>	<b class="keyword">void</b> Start () {
+		<mark><b class="type">GameEventManager</b>.GameStart += GameStart;</mark>
+		<mark><b class="type">GameEventManager</b>.GameOver += GameOver;</mark>
+		objectQueue = <b class="keyword">new</b> <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a>&lt;<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>&gt;(numberOfObjects);
+		<b class="keyword">for</b>(<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++){
+			objectQueue.Enqueue((<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>)Instantiate(
+				prefab<mark>, <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(<span class="constant">0f</span>, <span class="constant">0f</span>, -<span class="constant">100f</span>), <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Quaternion.html">Quaternion</a>.identity</mark>));
+		}
+		<mark>enabled = <b class="keyword">false</b>;</mark>
+	}
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameStart () {</mark>
+		nextPosition = startPosition;
+		<b class="keyword">for</b>(<b class="type">int</b> i = <span class="constant">0</span>; i &lt; numberOfObjects; i++){
+			Recycle();
+		}
+		<mark>enabled = <b class="keyword">true</b>;</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameOver () {</mark>
+		<mark>enabled = <b class="keyword">false</b>;</mark>
+	<mark>}</mark></pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/game_start.png" alt="game start" width="400" height="250">
+				<img src="./Runner, a Unity C# Tutorial_files/game_over.png" alt="game over" width="400" height="250">
+				<figcaption>Game start and game over.</figcaption>
+			</figure>
+
+			<h2>Power-Up</h2>
+
+			<div class="instructions">
+				Let's include a power-up that allows for mid-air boosts. We'll make it a spinning cube that appears
+				above platforms at random. We decide to have at most one such booster cube active in the scene at any
+				moment, so we can suffice with one instance and reuse it.
+				<p>
+				Create a new folder named <i class="name">Booster</i>. In it, create a new material named
+				<i class="name">Booster Mat</i>. Because it's spinning, we'll use the <i class="name">Specular</i>
+				shader for the material, giving it a green (0, 255, 0) color and a white specular color.
+				</p><p>
+				Now create a new cube, name is <i class="name">Booster</i>, and set its scale to 0.5 to make it small.
+				To make it a bit easier to hit, increase its collider's size to 1.5, which ends up being 0.75 due to
+				the scale. Then assign its material to it.
+				</p><p>
+				Mark the collider as a trigger, by checking its <i class="name">Is Trigger</i> field. We do this
+				because we want <i class="name">Runner</i> to pass right through it, instead of colliding.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-specular" id="q-specular">Why a specular shader?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-trigger" id="q-trigger">What does it mean to be a trigger?</a></li>
+				</ul>
+			</aside>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/booster.png" width="784" height="372">
+				<figcaption>Booster cube.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				Now create a new C# script named <i class="name">Booster</i> in the corresponding folder and
+				assign it to the <i class="name">Booster</i> object. We start
+				by giving it four public variables used to configure it. First, we need an offset from the platform's
+				center to place the booster. Let's set it to (0, 2.5, 0). Second, we need a rotation velocity to make
+				it spin. Let's use (45, 90, 1) to make it a bit lively. Third, we need a recycle offset, just as for
+				platforms, in case <i class="name">Runner</i> misses the power-up. Let's use a distance of 20. Fourth,
+				we include a spawn chance to make the appearance of the booster somewhat unpredictable. A 25% chance
+				per platform is fine.
+			</div>
+
+
+			<pre><mark><b class="keyword">using</b> UnityEngine;</mark>
+
+<mark><b class="keyword">public</b> <b class="keyword">class</b> <b class="type">Booster</b> : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {</mark>
+
+	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> offset, rotationVelocity;</mark>
+	<mark><b class="keyword">public</b> <b class="type">float</b> recycleOffset, spawnChance;</mark>
+<mark>}</mark></pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/booster_configuration.png" width="554" height="260">
+				<figcaption>Booster configuration.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				One way to make the spawning work is by requesting a booster placement each time a platform is recycled.
+				Then it's up to the booster itself whether it'll be placed. We'll add a method named
+				<code>SpawnIfAvailable</code> to <code><b class="type">Booster</b></code> for this. It requires a platform position so
+				we know where to place the booster. We leave it empty for now.
+			</div>
+
+			<pre>	<mark><b class="keyword">public</b> <b class="keyword">void</b> SpawnIfAvailable(<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> position){</mark>
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				We then add a variable to <code><b class="type">PlatformManager</b></code> to which we assign <i class="name">Booster</i>.
+				Inside the <code>Recycle</code>	method, we'll call its <code>PlaceIfAvailable</code> method after
+				we've determined the new platform's position.
+			</div>
+
+			<pre>	<mark><b class="keyword">public</b> <b class="type">Booster</b> booster;</mark>
+
+	<b class="keyword">private</b> <b class="keyword">void</b> Recycle () {
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> scale = <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.x, maxSize.x),
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.y, maxSize.y),
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minSize.z, maxSize.z));
+
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> position = nextPosition;
+		position.x += scale.x * <span class="constant">0.5f</span>;
+		position.y += scale.y * <span class="constant">0.5f</span>;
+		<mark>booster.SpawnIfAvailable(position);</mark>
+
+		<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a> o = objectQueue.Dequeue();
+		o.localScale = scale;
+		o.localPosition = position;
+		<b class="type">int</b> materialIndex = <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(<span class="constant">0</span>, materials.Length);
+		o.renderer.material = materials[materialIndex];
+		o.collider.material = physicMaterials[materialIndex];
+		objectQueue.Enqueue(o);
+		
+		nextPosition += <b class="keyword">new</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a>(
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.x, maxGap.x) + scale.x,
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.y, maxGap.y),
+			<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(minGap.z, maxGap.z));
+
+		<b class="keyword">if</b>(nextPosition.y &lt; minY){
+			nextPosition.y = minY + maxGap.y;
+		}
+		<b class="keyword">else</b> <b class="keyword">if</b>(nextPosition.y &gt; maxY){
+			nextPosition.y = maxY - maxGap.y;
+		}
+	}</pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/platform_manager_booster.png" width="320" height="412">
+				<figcaption>Platform manager knows about booster.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				Now that everything is connected, we need to update the <code>SpawnIfAvailable</code> method so it activates and positions the
+				booster, but only if it's not already active, and also taking the spawn chance into account. Also,
+				to make this work <code><b class="type">Booster</b></code> must begin deactivated and must also deactivate when the game ends.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-setActive" id="q-setActive">What does <code>setActive()</code> do?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-return" id="q-return">What does <code><b class="keyword">return</b></code> do?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<mark><b class="keyword">void</b> Start () {</mark>
+		<mark><b class="type">GameEventManager</b>.GameOver += GameOver;</mark>
+		<mark>gameObject.SetActive(<b class="keyword">false</b>);</mark>
+	}
+
+	<b class="keyword">public</b> <b class="keyword">void</b> SpawnIfAvailable (<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> position) {
+		<mark><b class="keyword">if</b>(gameObject.activeSelf || spawnChance &lt;= <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(<span class="constant">0f</span>, <span class="constant">100f</span>)) {</mark>
+			<mark><b class="keyword">return</b>;</mark>
+		<mark>}</mark>
+		<mark>transform.localPosition = position + offset;</mark>
+		<mark>gameObject.SetActive(<b class="keyword">true</b>);</mark>
+	}
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameOver () {</mark>
+		<mark>gameObject.SetActive(<b class="keyword">false</b>);</mark>
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				To make the booster spin and recycle, we have to add an <code>Update</code> method to it. Recycling
+				is achieved by simple deactivation, as that makes it eligible for a respawn via
+				<code>SpawnIfAvailable</code>. Rotation is achieved by rotating based on the elapsed time since the
+				last frame.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-deltaTime" id="q-deltaTime">What's <code><a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Time">Time</a>.deltaTime</code>?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<mark><b class="keyword">void</b> Update () {</mark>
+		<mark><b class="keyword">if</b>(transform.localPosition.x + recycleOffset &lt; <b class="type">Runner</b>.distanceTraveled){</mark>
+			<mark>gameObject.SetActive(<b class="keyword">false</b>);</mark>
+			<mark><b class="keyword">return</b>;</mark>
+		<mark>}</mark>
+		<mark>transform.Rotate(rotationVelocity * <a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Time">Time</a>.deltaTime);</mark>
+	<mark>}</mark></pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/booster_rotating.png" width="343" height="214">
+				<figcaption>Rotating booster.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				At the moment <i class="name">Runner</i> passed right through <i class="name">Booster</i>, nothing happened. To change this, we add the Unity event method <code>OnTriggerEnter</code> to
+				<code><b class="type">Booster</b></code>, which is called whenever something hits its trigger collider. Because we know
+				that the only thing that could possibly hit the booster is our runner, we can go ahead and give it
+				a new booster power-up whenever there's a trigger. Let's assume <code><b class="type">Runner</b></code> has a static method
+				named <code>AddBoost</code> for this purpose, and use that. We also deactivate the booster, because
+				it's been consumed.
+			</div>
+
+			<pre>	<mark><b class="keyword">void</b> OnTriggerEnter () {</mark>
+		<mark><b class="type">Runner</b>.AddBoost();</mark>
+		<mark>gameObject.SetActive(<b class="keyword">false</b>);</mark>
+	}</pre>
+
+			<div class="instructions">
+				To make this work, we have to add an <code>AddBoost</code> method to <code><b class="type">Runner</b></code>. To keep
+				things simple, let's just add a private static variable to remember how many boosts we have
+				accumulated.
+			</div>
+
+			<pre>	<mark><b class="keyword">private</b> <b class="keyword">static</b> <b class="type">int</b> boosts;</mark>
+
+	<b class="keyword">private</b> <b class="keyword">void</b> GameStart () {
+		<mark>boosts = <span class="constant">0</span>;</mark>
+		distanceTraveled = <span class="constant">0f</span>;
+		transform.localPosition = startPosition;
+		renderer.enabled = <b class="keyword">true</b>;
+		rigidbody.isKinematic = <b class="keyword">false</b>;
+		enabled = <b class="keyword">true</b>;
+	}
+
+	<mark><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">void</b> AddBoost () {</mark>
+		<mark>boosts += <span class="constant">1</span>;</mark>
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				To actually allow mid-air jumps by consuming boosts, we need to modify the code that checks whether
+				a jump is possible. Let's define a seperate boost velocity as well and set it to (10, 10, 0) for a
+				nice boost.
+			</div>
+
+			<pre>	<b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Vector3.html">Vector3</a> <mark>boostVelocity,</mark> jumpVelocity;
+
+	<b class="keyword">void</b> Update () {
+		<b class="keyword">if</b>(<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a>.GetButtonDown(<span class="constant">"Jump"</span>)){
+			<mark><b class="keyword">if</b>(touchingPlatform){</mark>
+				rigidbody.AddForce(jumpVelocity, <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.VelocityChange);
+				touchingPlatform = <b class="keyword">false</b>;
+			<mark>}</mark>
+			<mark><b class="keyword">else</b> <b class="keyword">if</b>(boosts &gt; <span class="constant">0</span>){</mark>
+				<mark>rigidbody.AddForce(boostVelocity, <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.VelocityChange);</mark>
+				<mark>boosts -= <span class="constant">1</span>;</mark>
+			<mark>}</mark>
+		}
+		distanceTraveled = transform.localPosition.x;
+
+		<b class="keyword">if</b>(transform.localPosition.y &lt; gameOverY){
+			<b class="type">GameEventManager</b>.TriggerGameOver();
+		}
+	}</pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/runner_boost_velocity.png" width="320" height="258">
+				<figcaption>Boost velocity.</figcaption>
+			</figure>
+
+			<h2>Informative GUI</h2>
+
+			<div class="instructions">
+				It works! As long as we have boosts remaining, <i class="name">Runner</i> can boost itself while in
+				flight. It would be useful to actually see how many boost are available, so let's add a display for
+				it to the GUI. While we're at it, let's show the distance traveled so far as well.
+				<p>
+				Create a new object with a <i class="name">GUIText</i> component as a child of
+				<i class="name">GUI</i>. Position it at (0.01, 0.99, 0), set its <i class="name">Anchor</i> to
+				upper left, give it font size 20 and a normal style. Name it <i class="name">Boosts Text</i>.
+				</p><p>
+				Create another such object, naming it <i class="name">Distance Text</i>. Set its position to
+				(0.5, 0.99, 0), with font size 30 and bold style. Its <i class="name">Anchor</i> should be set to
+				upper center.
+				</p><p>
+				Add two variables to <code><b class="type">GUIManager</b></code> for these new objects and assign them.
+			</p></div>
+
+			<pre>	<b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/GUIText.html">GUIText</a> <mark>boostsText, distanceText,</mark> gameOverText, instructionsText, runnerText;</pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/boosts_text.png" alt="boosts" width="320" height="386">
+				<img src="./Runner, a Unity C# Tutorial_files/distance_text.png" alt="distance" width="320" height="386">
+				<br><img src="./Runner, a Unity C# Tutorial_files/gui_full.png" alt="gui" width="226" height="178">
+				<img src="./Runner, a Unity C# Tutorial_files/gui_manager_full.png" alt="manager" width="320" height="188">
+				<figcaption>Boosts and distance.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				Let's add two static methods to <code><b class="type">GUIManager</b></code> which <code><b class="type">Runner</b></code> can use to notify
+				the GUI of changes to its distance traveled and boost count. Because the manager needs to use
+				nonstatic variables in those methods, we add a static variable that references itself. That way the
+				static code can get to the component instance which actually has the gui text elements.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-this" id="q-this">What's <code><b class="keyword">this</b></code>?</a></li>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-ToString" id="q-ToString">What does <code>ToString()</code> do?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<mark><b class="keyword">private</b> <b class="keyword">static</b> <b class="type">GUIManager</b> instance;</mark>
+
+	<b class="keyword">void</b> Start () {
+		<mark>instance = <b class="keyword">this</b>;</mark>
+		<b class="type">GameEventManager</b>.GameStart += GameStart;
+		<b class="type">GameEventManager</b>.GameOver += GameOver;
+		gameOverText.enabled = <b class="keyword">false</b>;
+	}
+
+	<mark><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">void</b> SetBoosts(<b class="type">int</b> boosts){</mark>
+		<mark>instance.boostsText.text = boosts.ToString();</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">void</b> SetDistance(<b class="type">float</b> distance){</mark>
+		<mark>instance.distanceText.text = distance.ToString(<span class="constant">"f0"</span>);</mark>
+	<mark>}</mark></pre>
+
+			<div class="instructions">
+				Now all we need to do is let <code><b class="type">Runner</b></code> call those methods whenever its distance or amount
+				of boosts changes.
+			</div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-labelsDirectly" id="q-labelsDirectly">Why not set the labels from <code><b class="type">Runner</b></code>?</a></li>
+				</ul>
+			</aside>
+
+			<pre>	<b class="keyword">void</b> Update () {
+		<b class="keyword">if</b>(<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a>.GetButtonDown(<span class="constant">"Jump"</span>)){
+			<b class="keyword">if</b>(touchingPlatform){
+				rigidbody.AddForce(jumpVelocity, <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.VelocityChange);
+				touchingPlatform = <b class="keyword">false</b>;
+			}
+			<b class="keyword">else</b> <b class="keyword">if</b>(boosts &gt; <span class="constant">0</span>){
+				rigidbody.AddForce(boostVelocity, <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.VelocityChange);
+				boosts -= <span class="constant">1</span>;
+				<mark><b class="type">GUIManager</b>.SetBoosts(boosts);</mark>
+			}
+		}
+		distanceTraveled = transform.localPosition.x;
+		<mark><b class="type">GUIManager</b>.SetDistance(distanceTraveled);</mark>
+
+		<b class="keyword">if</b>(transform.localPosition.y &lt; gameOverY){
+			<b class="type">GameEventManager</b>.TriggerGameOver();
+		}
+	}
+
+	<b class="keyword">private</b> <b class="keyword">void</b> GameStart () {
+		boosts = <span class="constant">0</span>;
+		<mark><b class="type">GUIManager</b>.SetBoosts(boosts);</mark>
+		distanceTraveled = <span class="constant">0f</span>;
+		<mark><b class="type">GUIManager</b>.SetDistance(distanceTraveled);</mark>
+		transform.localPosition = startPosition;
+		renderer.enabled = <b class="keyword">true</b>;
+		rigidbody.isKinematic = <b class="keyword">false</b>;
+		enabled = <b class="keyword">true</b>;
+	}
+
+	<b class="keyword">public</b> <b class="keyword">static</b> <b class="keyword">void</b> AddBoost(){
+		boosts += <span class="constant">1</span>;
+		<mark><b class="type">GUIManager</b>.SetBoosts(boosts);</mark>
+	}</pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/gui_complete.png" width="560" height="350">
+				<figcaption>Complete GUI.</figcaption>
+			</figure>
+
+			<h2>Particle Effects</h2>
+
+			<div class="instructions">
+				By now we have a functional game, but it feels a bit empty. Let's add some dust particles to fill
+				the empty space and enhance the sense of depth and speed.
+				<p>
+				Create a new a new particle system (<i class="menu">GameObject / Create Other / Particle System</i>) named <i class="name">Dust Emitter</i>.
+				Make it a child of <i class="name">Runner</i> with a position of (25, 0, 0) and reset its rotation, so it'll always stay
+				to the right of the camera view.
+				</p><p>
+				Set <i class="name">Start Lifetime</i> to <i>Random Between Two Constants</i> with values 6 and 10, and set <i class="name">Start Speed</i> to 0 so we get stationary particles with varied lifetimes to start with.
+				Also set <i class="name">Simulation Space</i> to <i>World</i> so the particles don't move with <i class="name">Runner</i>.
+				To increase variety, set <i class="name">Start Size</i> to <i>Random Between Two Constants</i> with values 0.2 and 0.8.
+				</p><p>
+				Change the shape to a box with dimensions (1, 30, 10) so we get a large spawning area, and increase the <i class="name">Rate</i> of <i class="name">Emission</i> to 20.
+				</p><p>
+				Activate <i class="name">Velocity Over Lifetime</i>, set it to use world space and a random range between two constants, using the vectors
+				(-1, -1, 0) and (-4, 1, 0). This way the particles have some individual movement.
+				</p><p>
+				Finally activate <i class="name">Color over Lifetime</i> and change to gradient so it has an alpha value of 0 at 100%. This adds some fading to the particles.
+				</p><p>
+				Next, duplicate this particle system, keep it a child of <i class="name">Runner</i>, reset its position, and name it
+				<i class="name">Trail Emitter</i>. We'll use this one for a condensation trail effect left behind by
+				<i class="name">Runner</i>.
+				</p><p>
+				Change its <i class="name">Shape</i> to <i>Mesh</i> and set it to a cube (by clicking on the dot), and deactivate <i class="name">Velocity over Lifetime</i>.
+				</p><p>
+				Decrease <i class="name">Start Lifetime</i> to between 1 and 2 and <i class="name">Start Size</i> to between 0.2 and 0.4, to keep the trail subtle and short.
+			</p></div>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/dust_emitter.png" alt="dust" width="320" height="764">
+				<img src="./Runner, a Unity C# Tutorial_files/trail_emitter.png" alt="trail" width="320" height="764">
+				<img src="./Runner, a Unity C# Tutorial_files/runner_particle_systems.png" alt="scene" width="226" height="148">
+				<figcaption>Particle systems.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				As we only want to spawn particles when a game is in progress, we'll create a manager for them.
+				Add a new C# script in the <i class="name">Managers</i> folder and name it
+				<i class="name">ParticleSystemManager</i>. Also create an appropriately named child object for
+				<i class="name">Managers</i> and assign the manager script to it.
+				<p>
+				The only thing that <code>ParticleSystemManager</code> has to do is switch the particle systems
+				on and off at the appropriate time. We'll use an array variable named <code>particleSystems</code> to hold
+				references to all emitters that need to be managed. In this case, that's the two emitters we just
+				created, but the manager can deal with any additional emitters you'd like to create.
+				</p><p>
+				Assign our two particle emitters by dragging them to the <i class="name">Particle Systems</i> field.
+			</p></div>
+
+			<aside>
+				<ul>
+					<li><a href="http://catlikecoding.com/unity/tutorials/runner/#a-gameOverInStart" id="q-gameOverInStart">Why call <code>GameOver</code> in <code>Start</code>?</a></li>
+				</ul>
+			</aside>
+
+			<pre><mark><b class="keyword">using</b> UnityEngine;</mark>
+
+<mark><b class="keyword">public</b> <b class="keyword">class</b> ParticleSystemManager : <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a> {</mark>
+
+	<mark><b class="keyword">public</b> <a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ParticleSystem.html">ParticleSystem</a>[] particleSystems;</mark>
+
+	<mark><b class="keyword">void</b> Start () {</mark>
+		<mark><b class="type">GameEventManager</b>.GameStart += GameStart;</mark>
+		<mark><b class="type">GameEventManager</b>.GameOver += GameOver;</mark>
+		<mark>GameOver();</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameStart () {</mark>
+		<mark><b class="keyword">for</b>(<b class="type">int</b> i = <span class="constant">0</span>; i &lt; particleSystems.Length; i++){</mark>
+			<mark>particleSystems[i].Clear();</mark>
+			<mark>particleSystems[i].enableEmission = <b class="keyword">true</b>;</mark>
+		<mark>}</mark>
+	<mark>}</mark>
+
+	<mark><b class="keyword">private</b> <b class="keyword">void</b> GameOver () {</mark>
+		<mark><b class="keyword">for</b>(<b class="type">int</b> i = <span class="constant">0</span>; i &lt; particleSystems.Length; i++){</mark>
+			<mark>particleSystems[i].enableEmission = <b class="keyword">false</b>;</mark>
+		<mark>}</mark>
+	<mark>}</mark>
+<mark>}</mark></pre>
+
+			<figure>
+				<img src="./Runner, a Unity C# Tutorial_files/particle_system_manager.png" alt="manager" width="784" height="180">
+				<img src="./Runner, a Unity C# Tutorial_files/particles_in_action.png" alt="game" width="560" height="350">
+				<figcaption>Particles in action.</figcaption>
+			</figure>
+
+			<div class="instructions">
+				That's it, we've finished the game! We can run and jump, leave a trail, collect power-ups, see our
+				score, and have a scrolling background. It's a nice prototype that, with a lot of polish, you can
+				transform into a finished game.
+			</div>
+			
+			<aside class="share"><div class="-share"><a href="https://twitter.com/share" class="twitter-share-button" data-via="catlikecoding" data-hashtags="Unity3D"></a></div><div class="-share"><div id="___plus_1" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 104px; height: 20px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 104px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I2_1392920107194" name="I2_1392920107194" src="./Runner, a Unity C# Tutorial_files/sharebutton(1).htm" data-gapiattached="true" title="+Partager"></iframe></div></div><div class="-share"><div class="fb-share-button" data-type="button_count"></div></div></aside>
+
+			<h2>Downloads</h2>
+
+			<dl>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner_01.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 1]);" target="_blank">runner_01.unitypackage</a></dt>
+				<dd>The project at the start of Generating a Skyline.</dd>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner_02.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 2]);" target="_blank">runner_02.unitypackage</a></dt>
+				<dd>The project at the start of Generating Platforms.</dd>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner_03.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 3]);" target="_blank">runner_03.unitypackage</a></dt>
+				<dd>The project at the start of Jumping and Falling.</dd>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner_04.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 4]);" target="_blank">runner_04.unitypackage</a></dt>
+				<dd>The project at the start of Platform Variety.</dd>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner_05.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 5]);" target="_blank">runner_05.unitypackage</a></dt>
+				<dd>The project at the start of Game Events.</dd>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner_06.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 6]);" target="_blank">runner_06.unitypackage</a></dt>
+				<dd>The project at the start of Power-Up.</dd>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner_07.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 7]);" target="_blank">runner_07.unitypackage</a></dt>
+				<dd>The project at the start of Informative GUI.</dd>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner_08.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 8]);" target="_blank">runner_08.unitypackage</a></dt>
+				<dd>The project at the start of Particle Effects.</dd>
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/runner.unitypackage" onclick="_gaq.push([&#39;_trackEvent&#39;, &#39;Unity&#39;, &#39;Download&#39;, &#39;Runner Tutorial&#39;, 0]);" target="_blank">runner.unitypackage</a></dt>
+				<dd>The finished project.</dd>
+			</dl>
+		</article>
+
+			<h1>Questions &amp; Answers</h1>
+
+			<dl class="questions-answers">
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-collider" id="a-collider">What's a collider?</a></dt>
+				<dd>
+					A collider is a physics concept used by Unity's physics engine. They can function as either
+					obstacles, causing collisions, or detectors, triggering events.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-removeColliders" id="a-removeColliders">Why remove the colliders?</a></dt>
+				<dd>
+					Because the cubes will be used for the noninteractive background only, nothing will ever collide
+					with then. There's	no point in the physics engine keeping track of their colliders, so we simply
+					remove them.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-material" id="a-material">What's a material?</a></dt>
+				<dd>
+					Materials are used to define the visual properties of objects. They can range from very simple,
+					like a constant color, to very complex.
+					<p>
+					Materials consist of a shader and whatever data the shader needs. Shaders are basically scripts
+					that tell the graphics card how an object's polygons should be drawn.
+					</p><p>
+					The standard diffuse shader uses a single color and optionally a texture, along with the light
+					sources in the scene, to determine the appearance of polygons.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-color" id="a-color">What about the fourth color component?</a></dt>
+				<dd>
+					Although colors have four components, I'm mentioning only three. The fourth component is the
+					alpha value, which represents the opacity of the color. I assume this value is 255 by default,
+					though it doesn't really matter as we won't create any materials that take alpha into account.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-child" id="a-child">What does it mean to be a child?</a></dt>
+				<dd>
+					Beyond the obvious effect on the object hierarcy, being a child means that you are subject to
+					the <i class="name">Transform</i> component of your parent. Your own transformation is
+					relative to your parent's. When it moves, so do you. When it rotates, you orbit around its
+					pivot. When it scales, both your size and your relative position scale as well.
+					<p>
+					From a low-level graphics point of view, the hierarchy corresponds to how the transformation
+					matrix stack is created. The parent's matrix is pushed first, then the child's matrix.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-prefab" id="a-prefab">What's a prefab?</a></dt>
+				<dd>
+					A prefab is a Unity object – or hierarchy of objects – that doesn't exist in the
+					scene and hasn't been activated. You use it as a template, creating clones of it and adding those
+					to the scene.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-instantiate" id="a-instantiate">What does <code>Instantiate</code> do?</a></dt>
+				<dd>
+					The <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Object.html">Object</a></code> class, which every <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.html">MonoBehaviour</a></code> inherits from, contains
+					the static <code>Instantiate</code> method. This method creates a clone of whatever
+					<code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Object.html">Object</a></code> instance you pass to it. Optionally, you can supply a new position and
+					rotation for the clone, otherwise it keeps the values of the original.
+					<p>
+					Note that <code>Instantiate</code> returns an <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Object.html">Object</a></code> reference. If you want to do
+					something with the new clone, you have to cast it to the correct type.
+					</p><p>
+					Typically, this method is used with prefabs, but you can also clone objects that already exist
+					in the scene.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-add" id="a-add">What does <code>+=</code> do?</a></dt>
+				<dd>
+					The code <code>x += y;</code> adds x and y together and assigns the result back to x. You can
+					consider it a short alternative for the code <code>x = x + y;</code>
+					<p>
+					There are other operators that behave in a similar fashion, like <code>-=</code>, <code>*=</code>,
+					and <code>/=</code>.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-distanceTraveled" id="a-distanceTraveled">Why is <code>distanceTraveled</code> static?</a></dt>
+				<dd>
+					Because static variables exist independent of object instances, we can access it everywhere via
+					<code><b class="type">Runner</b>.distanceTraveled</code>. If it were nonstatic, we first need to get a reference to
+					our runner instance before we could get to <code>distanceTraveled</code>.
+					<p>
+					Of course, we could just add a <code><b class="type">Runner</b></code> variable to <code><b class="type">SkylineManager</b></code> and
+					assign <i class="name">Runner</i> to it. However, this approach gets unwieldy when we'll need
+					the value in multiple scripts later.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-queue" id="a-queue">What's a <code><a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a></code>?</a></dt>
+				<dd>
+					The <code>System.Collections.Generic</code> namespace contains the <code><a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a></code> class,
+					which can be used to represent a first-in, first-out queue. By constantly moving the first
+					entry in the queue to the end of it, we effectively get a rotating ring.
+					<p>
+					<code><a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a></code> is a generic class that can deal with any one type of content. In this case,
+					we use <code><a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Queue">Queue</a>&lt;<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a>&gt;</code> to declare a queue of <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Transform.html">Transform</a></code>
+					references.
+					</p><p>
+					You can add to the end of the queue by using the <code>Enqueue</code> method. Taking out the
+					first item is done with the <code>Dequeue</code> method. Additionaly, you can get to the first
+					item without removing it via the <code>Peek</code> method.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-random" id="a-random">What does <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range</code> do?</a></dt>
+				<dd>
+					<code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a></code> is a utility class that contains some stuff to create random values. Its
+					<code>Range</code> method can be used to generate a random value within some range.
+					<p>
+					There are two versions of the <code>Range</code> method. You can call it with two floats, in
+					which case it returns a float between the minimum and maximum value, both inclusive.
+					</p><p>
+					Alternatively, you can call <code>Range</code> with two integers, in which case it returns an
+					integer between the minimum, inclusive, and maximum, exclusive. A typical use for this version
+					is selecting an index at random, like <code>someArray[<a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Random.html">Random</a>.Range(<span class="constant">0</span>, someArray.Length)]</code>.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-rigidbody" id="a-rigidbody">What's a rigidbody?</a></dt>
+				<dd>
+					A rigidbody is a physics concept, literally a rigid body that doesn't deform. Unity's physics
+					engine will simulate real-world physics behavior for all objects with <code>RigidBody</code>
+					components, causing them to fall, move, and collide with other stuff.
+					<p>
+					It is also possible to have soft bodies, which do deform, like cloth.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-physicMaterial" id="a-physicMaterial">What's a physic material?</a></dt>
+				<dd>
+					Physic materials are like regular materials, except they deal with collision instead of visual
+					properties. When objects collide, what happens depends on whether they're made of stone, wood,
+					ice, rubber, or some other substance. You use physic materials to simulate this behavior by
+					configuring friction and bounciness.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-fixedUpdate" id="a-fixedUpdate">When is <code>FixedUpdate</code> called?</a></dt>
+				<dd>
+					The physics engine works by dividing time into little discrete steps – by default 0.02
+					seconds – during which it moves objects and then checks for collisions and triggers. It
+					keeps doing that in a loop until it has caught up with real time.
+					<p>
+					The <code>FixedUpdate</code> method works like <code>Update</code>, except that it's called once
+					per physics step instead of once per frame. In other words, <code>FixedUpdate</code> is
+					independent of the frame rate.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-addForce" id="a-addForce">What does <code>AddForce</code> do?</a></dt>
+				<dd>
+					The <code>AddForce</code> method applies a force to a rigidbody, which might result in an
+					acceleration, which builds up velocity, which results in movement.
+					<p>
+					There are actually various ways to use this method, which you control with the second parameter.
+					For example, if you want to apply a specific acceleration, regardless of an object's mass, you can
+					use the <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.Acceleration</code> option. If you want to directly adjust the velocity,
+					you can use <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/ForceMode.html">ForceMode</a>.VelocityChange</code>.
+				</p></dd>
+
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-andAlso" id="a-andAlso">What does <code>&amp;&amp;</code> do?</a></dt>
+				<dd>
+					The <code>&amp;&amp;</code> operator is used for boolean logic and stands for 'and also'. In
+					other words, <code>x &amp;&amp; y</code> is only true if both <code>x</code> and
+					<code>y</code> are true.
+					<p>
+					Note that if <code>x</code> is found to be false, there's no point in checking <code>y</code>
+					anymore. If <code>y</code> were a method call, it won't be invoked. Because of this, when
+					<i class="name">Runner</i> isn't touching the platform, the input won't be checked at all.
+					</p><p>
+					The companion of <code>&amp;&amp;</code> is the <code>||</code> operator, which stands for
+					'or else'. So <code>x || y</code> is true if at least one of them is. Also, if
+					<code>x</code> is found to be true, then <code>y</code> will not be considered.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-getButtonDown" id="a-getButtonDown">What does <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a>.GetButtonDown</code> do?</a></dt>
+				<dd>
+					<code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Input.html">Input</a></code> is a utility class that contains stuff to detect the player's input. This can
+					be anything from button presses to mouse movement to joystick motion.
+					<p>
+					The <code>GetButtonDown</code> method can be used to check whether the user just pressed down
+					a key associated with some button or action. Correspondingly, the <code>GetButtonUp</code> method
+					can be used the check whether the user just released it. Also, the <code>GetButton</code> method
+					tells you whether the button is current held down.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-jumpVelocity" id="a-jumpVelocity">Shouldn't the jump be in <code>FixedUpdate</code>?</a></dt>
+				<dd>
+					When the player presses a jump button, we want the velocity change to happed exactly once.
+					For single instantaneous events, putting the code in <code>Update</code> is equivalent to writing
+					code that would activate once in the next <code>FixedUpdate</code>.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-staticClass" id="a-staticClass">Why is the class static?</a></dt>
+				<dd>
+					By marking a class as static you require that its contents are static as well. There can't be
+					any nonstatic variables or methods and it cannot be used to create object instances. In other
+					words, a static class is not a blueprint for objects.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-delegate" id="a-delegate">What's a <code><b class="keyword">delegate</b></code>?</a></dt>
+				<dd>
+					Besides simple values and object references, you also store method references in a variable.
+					Such a variable is known as a delegate.
+					<p>
+					You define a delegate type as if you're creating a method, except there's no code body. After
+					that, you can use this type to create a delegate variable, to which you can assign any method
+					that matches the type. You can then treat this variable like a method. In fact, you can treat
+					a delegate like a list and add multiple methods to it. All of them will be called when you
+					invoke the variable.
+					</p><p>
+					The <a href="http://catlikecoding.com/unity/tutorials/graphs/">Graphs</a> tutorial uses delegates
+					to dynamically select what kind of graph to generate.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-event" id="a-event">What's an <code><b class="keyword">event</b></code>?</a></dt>
+				<dd>
+					For our purposes, an event is a restricted form of a delegate, forced to behalve like a list.
+					We could use a regular delegate variable instead and it would work just fine.
+					<p>
+					Both events and delegates allow methods to be added and removed from them, via
+					<code>myEvent += myMethod</code> and <code>myEvent -= myMethod</code>. A delegate also allows
+					a direct assignment, via <code>myDelegate = myMethod</code>. Doing so replaces whatever other
+					methods had been added to it before. We only want the former functionality and not the latter.
+					By disallowing it altogether, we protect ourselves from a potentially hard to find bug caused by
+					forgetting to write a single <code>+</code> somewhere.
+					</p><p>
+					Also, events can only be invoked by the class that defines them. Outsiders can only register and unregister methods to them.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-null" id="a-null">What's <code><b class="keyword">null</b></code>?</a></dt>
+				<dd>
+					The default value of a variable that's not a simple value is <code><b class="keyword">null</b></code>. This means
+					that the variable doesn't reference anything yet. Trying to invoke or access anything from a
+					variable that's <code><b class="keyword">null</b></code> results in an error. You can test for this value to make sure
+					that doesn't happen. You can also set such a variable to <code><b class="keyword">null</b></code> yourself, in case you
+					no longer need whatever it was referencing.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-notEqual" id="a-notEqual">What does <code>!=</code> do?</a></dt>
+				<dd>
+					The <code>!=</code> operator checks whether two things are different. For example,
+					<code><span class="constant">1</span> != <span class="constant">2</span></code> is true, while <code><span class="constant">2</span> != <span class="constant">2</span></code> is false. In our case, we're checking
+					whether our event isn't <code><b class="keyword">null</b></code>, which it would be if no methods had been added to it.
+					<p>
+					In contrast, the <code>==</code> operator checks whether two things are equal.
+					</p><p>
+					Note that for object references, equality is usually a matter identity. Two different objects with
+					the exact same contents are not considered equal.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-guiText" id="a-guiText">What's with the text positions?</a></dt>
+				<dd>
+					The GUI text is not drawn in 3D but in 2D, relative to the screen. A position of (0, 0)
+					corresponds to the lower left corner, while (1, 1) corresponds to the top right
+					corner.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-triggerAndHandle" id="a-triggerAndHandle">Why trigger and handle the same event?</a></dt>
+				<dd>
+					If we trigger the game start event, why not simply put the disabling code right after the call
+					to <code>TriggerGameStart</code>?
+					<p>
+					Any code that deals with the game start has nothing to do with the <code>Update</code> method.
+					Regardless how a game start is triggered, it should simply work. That's why we put the code in
+					the appropriate event handler method. If we ever add another way to start a new game,
+					<code><b class="type">GUIManager</b></code> will respond to the event just fine.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-resetDistance" id="a-resetDistance">Why immediately reset the distance?</a></dt>
+				<dd>
+					Leaving it to the <code>Update</code> method to override <code>distanceTraveled</code>
+					could lead to bugs. For example, if <i class="name">Platform Manager</i> happens to be updated
+					before <i class="name">Runner</i>, it would recycle based on the old distance. If this distance
+					is far ahead, the first platform will be recycled immediately, causing <i class="name">Runner</i>
+					to plummet to its doom.
+					<p>
+					There are ways to enforce the order in which components are updated, but it is better to
+					guarantee correct results regardless of update order. If you provide public data, make
+					sure it's always up to date.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-kinematic" id="a-kinematic">What does it mean to be kinematic?</a></dt>
+				<dd>
+					A kinematic rigidbody will not be moved by the physics engine. However, other things will still
+					react to it appropriately. In a way, it's a physics object that defies the laws of physics.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-quaternionIdentity" id="a-quaternionIdentity">What's <code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Quaternion.html">Quaternion</a>.identity</code>?</a></dt>
+				<dd>
+					<code><a class="unity-type" href="http://docs.unity3d.com/Documentation/ScriptReference/Quaternion.html">Quaternion</a>.identity</code> is a static property that corresponds to the identity quaternion,
+					which results in no rotation.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-specular" id="a-specular">Why a specular shader?</a></dt>
+				<dd>
+					The default specular shader works like the diffuse shader, except that it also has a specular
+					color and a shininess value. The shader uses these to add a highlight to the visuals.
+					<p>
+					We use this shader for <i class="name">Booster</i> because it results in more vivid color changes
+					while it rotates.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-trigger" id="a-trigger">What does it mean to be a trigger?</a></dt>
+				<dd>
+					By default, a collider acts like a solid object. You can use the <code>OnCollisionEnter</code>
+					method to detect when something hits it.
+					<p>
+					If a collider is a trigger, it's like a ghost and does not influence the movement of other
+					physics object. Instead, it acts like a radar or alarm. You can use the
+					<code>OnTriggerEnter</code> method to detect when something enters the collider's volume.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-setActive" id="a-setActive">What does <code>setActive()</code> do?</a></dt>
+				<dd>
+					You use this method to either activate or deactivate an entire game object, not just a single component.
+					Also, when deactivating a game object all its child game objects will be deactivated as well. So a game
+					object is only really active when both itself and all of its parents are active. You can check whether this
+					is the case via the property <code>activeInHierarchy</code>. You can also check <code>activeSelf</code> which
+					disregards the hierarchy, which is what we do because our <i class="name">Booster</i> has no parents.
+				</dd>
+				
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-return" id="a-return">What does <code><b class="keyword">return</b></code> do?</a></dt>
+				<dd>
+					You use the <code><b class="keyword">return</b></code> keyword to incidate that a method is finished. Implicitly,
+					it's at the end of every method. You can use it to add multiple exit paths to a method.
+					<p>
+					In our case, we check whether <i class="name">Booster</i> shouldn't be spawned, either because
+					it's already active or because of the spawn chance. If we shouldn't spawn, we simply return
+					back to where the method was called.
+					</p><p>
+					In case a method produces some result – like a number, shown in the
+					<a href="http://catlikecoding.com/unity/tutorials/graphs/">Graphs</a> tutorial – you need to explicitly
+					declare what result it returns.
+				</p></dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-deltaTime" id="a-deltaTime">What's <code><a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Time">Time</a>.deltaTime</code>?</a></dt>
+				<dd>
+					<code><a class="msdn-type" href="http://social.msdn.microsoft.com/search/en-us?query=Time">Time</a></code> is a utility class for time-related stuff. Its <code>deltaTime</code>
+					property contains the amount of seconds passed since the last frame, or since the last fixed
+					time step if called inside <code>FixedUpdate</code>.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-this" id="a-this">What's <code><b class="keyword">this</b></code>?</a></dt>
+				<dd>
+					The <code><b class="keyword">this</b></code> keyword is a reference to an object itself. As a consequence, it can only
+					be used inside nonstatic methods.
+					<p>
+					Whenever you're accessing a variable of an object inside one of its methods, you're implicitly
+					using <code><b class="keyword">this</b></code> to access it. For example, inside the <code>Update</code> method,
+					<code>transform</code> is the same as <code><b class="keyword">this</b>.transform</code>.
+				</p></dd>
+				
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-ToString" id="a-ToString">What does <code>ToString()</code> do?</a></dt>
+				<dd>
+					The <code>ToString</code> method can be used to create string representations of data.
+					We use it for an <code><b class="type">int</b></code> and a <code><b class="type">float</b></code>. The first conversion is simply the decimal
+					representation of the number (its real form is binary). We do the same for the <code><b class="type">float</b></code>,
+					except we also add a format description which tells the method to no display the fractional part.
+				</dd>
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-labelsDirectly" id="a-labelsDirectly">Why not set the labels from <code><b class="type">Runner</b></code>?</a></dt>
+				<dd>
+					By putting a manager in between <i class="name">Runner</i> and the GUI, we make both independent
+					of each other. The <code><b class="type">Runner</b></code> class doesn't deal with GUI details, only with runner
+					details.
+					<p>
+					If we were to change the GUI – like using icons to display boosts instead of a label –
+					we only need to modify <code><b class="type">GUIManager</b></code>, the rest of the game doesn't care about the change.
+					</p><p>
+					We could go one step further and not make <code><b class="type">Runner</b></code> call the GUI manager at all. Then
+					it would be up to <code><b class="type">GUIManager</b></code> to get the boost count from <code><b class="type">Runner</b></code> instead.
+					However, then the manager must know details about the runner, which it really shouldn't. Complete
+					decoupling might be achieved by using an event for this, but that's a rather heavy-handed approach
+					for a straightforward case like this. A simple call to a manager is fine.
+				</p></dd>
+
+
+				<dt><a href="http://catlikecoding.com/unity/tutorials/runner/#q-gameOverInStart" id="a-gameOverInStart">Why call <code>GameOver</code> in <code>Start</code>?</a></dt>
+				<dd>
+					Initially, we want our particle systems to not emit, until the first game-start event is triggered.
+					So we need to loop over all emitters and shut them off. Because that's the exact same thing that
+					our <code>GameOver</code> method does, we call it instead of writing the same code twice.
+				</dd>
+			</dl>
+
+		<footer><nav><ul><li><a href="http://catlikecoding.com/about/">About</a></li><li><a href="http://catlikecoding.com/blog/">Blog</a></li><li><a href="http://catlikecoding.com/contact/">Contact</a></li><li><a href="http://catlikecoding.com/unity/documentation/">Documentation</a></li><li><a href="http://catlikecoding.com/unity/products/">Products</a></li><li><a href="http://catlikecoding.com/unity/tutorials/">Tutorials</a></li></ul></nav><a href="http://catlikecoding.com/">© Catlike Coding</a><p></p><ul><li><a href="https://twitter.com/catlikecoding" rel="me">Twitter</a></li><li><a href="https://www.facebook.com/catlikecoding" rel="me">Facebook</a></li><li><a href="https://google.com/+CatlikeCoding" rel="me publisher">Google+</a></li></ul></footer>
+		<script src="./Runner, a Unity C# Tutorial_files/jquery.js"></script>
+		<script src="./Runner, a Unity C# Tutorial_files/default.js"></script>
+	
+<iframe name="oauth2relay1383046820" id="oauth2relay1383046820" src="./Runner, a Unity C# Tutorial_files/postmessageRelay.htm" tabindex="-1" style="width: 1px; height: 1px; position: absolute; top: -100px;"></iframe></body></html>
